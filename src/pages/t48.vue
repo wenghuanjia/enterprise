@@ -457,9 +457,9 @@ export default {
         } else {
             this.loading = false;
         }
-        console.log(this.biao_id)
-        console.log(this.pro_id)
-        console.log(this.project_type_id)
+        // console.log(this.biao_id)
+        // console.log(this.pro_id)
+        // console.log(this.project_type_id)
     },
     computed: {
         ...mapState(['state_flag', 'audit_flag'])

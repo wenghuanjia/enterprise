@@ -75,7 +75,7 @@
       <!-- 用户 -->
       <div class="user" @click.stop="showOut">
         <div class="user_logo">
-          <img src="../images/user.png" alt>
+          <img src="../images/user.png" alt />
           <div class="user_name" v-if="userInfo">{{ userInfo.user_login }}</div>
         </div>
         <div class="login_out" v-if="show">
@@ -99,7 +99,7 @@
         <div class="step">
           <div class="step_item">
             <div class="address">
-              <img src="../images/adderss.png" alt>
+              <img src="../images/adderss.png" alt />
               <span class="data">填写的材料</span>
             </div>
           </div>
@@ -108,11 +108,10 @@
               <el-step
                 v-for="(step,i) in steps"
                 :key="i"
-                :class="(i+1) == current?'currentStyle':''"
+                :class="{currentStyle:(i+1) == current&&id==step.id}"
                 :title="step.title"
-                @click.native="handleChoose(i)"
-              >
-              </el-step>
+                @click.native="handleChoose(i, step.id)"
+              ></el-step>
             </el-steps>
           </div>
         </div>
@@ -125,8 +124,10 @@
   </div>
 </template>
 <script>
+// :class="((i+1) == current)?'currentStyle':''"
 import { mapState, mapMutations } from "vuex";
-import { addProject } from "service/getData"
+import { addProject } from "service/getData";
+import { getStore, setStore } from "../common/common";
 export default {
   data() {
     return {
@@ -134,13 +135,21 @@ export default {
       tabPosition: "left",
       show: false,
       showarr: [],
+      id: 45,
       current: 1,
       steps: [
-        { id: 1, title: "每月填写研发费用表" },
-        { id: 2, title: "研发人员" },
-        { id: 3, title: "研发项目" },
-        { id: 4, title: "知识产权管理模块" },
-        { id: 5, title: "高新材料收集管理" }
+        { id: 45, title: "每月填写研发费用表" },
+        { id: 46, title: "研发人员" },
+        { id: 47, title: "研发项目" },
+        { id: 48, title: "知识产权管理模块" },
+        { id: 49, title: "高新材料收集管理" }
+      ],
+      arr: [
+        { num: 1, id: 45 },
+        { num: 2, id: 46 },
+        { num: 3, id: 47 },
+        { num: 4, id: 48 },
+        { num: 5, id: 49 }
       ]
     };
   },
@@ -163,10 +172,12 @@ export default {
         this.show = false;
       }
     },
-    handleChoose(i) {
+    // 切换表格
+    handleChoose(i, id) {
       i = i + 1;
       this.current = i;
-      // this.$router.push({})
+      setStore("current", this.current);
+      this.$router.push({ path: `/index/t${id}` });
     }
   },
   computed: {
@@ -174,6 +185,30 @@ export default {
   },
   async created() {
     this.INIT_USERINFO();
+    let href = window.location.href.split("/");
+    for (let i = 0; i < href.length; i++) {
+      if (href[i].startsWith("t")) {
+        this.id = href[i].substr(1);
+      }
+    }
+    if (getStore("current")) {
+      this.current = JSON.parse(getStore("current"));
+    }
+  },
+  updated() {
+    let href = window.location.href.split("/");
+    for (let i = 0; i < href.length; i++) {
+      if (href[i].startsWith("t")) {
+        this.id = href[i].substr(1);
+        for (let j = 0; j < this.arr.length; j++) {
+          if (this.id == this.arr[j].id) {
+            this.current = this.arr[j].num;
+            setStore("current", this.arr[j].num);
+            break;
+          }
+        }
+      }
+    }
   }
 };
 </script>
@@ -374,6 +409,6 @@ export default {
     padding-bottom: 20px;
   }
 }
-.currentStyle {}
-
+.currentStyle {
+}
 </style>
